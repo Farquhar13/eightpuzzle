@@ -36,6 +36,8 @@ class Board:
                 blockDistance = abs(i - coordinate[0]) + abs(j - coordinate[1])  # determines how far the block is from the goal state position
                 totalDistance = totalDistance + blockDistance  # sums each block's distance from goal position
         self.h = totalDistance
+        if self.h == 0:
+            pass  # win condition
         self.updateF()
 
     # Finds the coordinate of a block, given as an argument
@@ -58,16 +60,7 @@ class Board:
 
         # Checks if a block can be moved left
         if 0 <= zeroX + 1 <=2:
-            newState = self
-            block = self.state[zeroX + 1][zeroY]
-            newState.state[zeroX][zeroY] = block
-            newState.state[zeroX + 1][zeroY] = '0'
-            # check if state matches any from boardList
-            if self.uniqueState:
-                newState.moveList.append([block, "up"])  # adds move to moveList
-                boardList.append(newState)  # adds newState to boardList
-                newState.g = self.g + 1  # increments g
-                self.manhattanDistance()  # updates h which updates f
+            Successor(self, "up")
 
         '''# Checks if a block can be moved right
         if 0 <= zeroX - 1 <=2:
@@ -108,6 +101,7 @@ class Board:
                 newState.g = self.g + 1
                 self.manhattanDistance()'''
 
+
     # Checks if an expanded state is already in boardList
     def uniqueState(self):
         for board in boardList:
@@ -125,6 +119,26 @@ class Board:
                 minIndex = i
         boardList[minIndex].moveBlock()  # selects lowest board with lowest f to expand in moveBlock
 
+
+class Successor(Board):
+    def __init__(self, parent, direction):
+        self.state = parent.state
+        self.f = parent.f  # function = g + h
+        self.g = parent.g  # cost function
+        self.h = parent.h  # hueristic = Manhattan distance
+        self.moveList = parent.moveList
+        self.expanded = False
+
+        if direction == "up":
+            zeroX, zeroY = self.goalCoordinates('0')
+            block = self.state[zeroX + 1][zeroY]
+            self.state[zeroX + 1][zeroY] = '0'
+            self.state[zeroX][zeroY] = block
+            if self.uniqueState():
+                self.moveList.append(block, "up")
+                self.g = self.g + 1
+                self.manhattanDistance()
+                boardList.append(self)
 
 
 

@@ -62,10 +62,10 @@ class Board:
             newState.state[zeroX][zeroY] = block
             newState.state[zeroX + 1][zeroY] = '0'
             #check if state matches any from boardList
-
-            newState.moveList.append([block, "left"])
-            boardList.append(newState)
-            newState.g = self.g + 1
+            if self.uniqueState == True:
+                newState.moveList.append([block, "left"])
+                boardList.append(newState)
+                newState.g = self.g + 1
 
         if 0 <= zeroX - 1 <=2:
             print "right"
@@ -73,6 +73,23 @@ class Board:
             print "up"
         if 0 <= zeroY - 1 <=2:
             print "down"
+
+    def uniqueState(self):
+        for board in boardList:
+            if self.state == board.state:
+                return False
+            else:
+                return True
+
+    def lowestF(self):
+        min = 1000000
+        for i in range len(boardList):
+            if boardList[i].expanded == False and boardList[i].f < min:
+                min = boardList[i].f
+                minIndex = i
+
+
+
 
 
 startState = Board()

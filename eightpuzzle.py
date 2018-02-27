@@ -126,8 +126,9 @@ class Board:
 
 class Successor(Board):
     def __init__(self, parent, direction):
-        x = parent.state
-        self.state = x
+        global boardList
+
+        self.state = parent.state
         self.f = parent.f  # function = g + h
         self.g = parent.g  # cost function
         self.h = parent.h  # hueristic = Manhattan distance

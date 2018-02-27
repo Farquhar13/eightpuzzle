@@ -1,24 +1,24 @@
+import copy
+import sys
 
 list = [None]
 
 class MyClass:
     def __init__(self):
         self.one = 1
-        print "printing from class"
+        self.list = [1, 2, 3]
 
-class LowerClass(MyClass):
-    def __init__(self, parent):
-        self.one = parent.one
+a = MyClass()
+b = copy.deepcopy(a)
 
-higher = MyClass()
-lower = LowerClass(higher)
-print "higher", higher.one
-print "lower:", lower.one
-lower.one = 2
-print "higher", higher.one
-print "lower:", lower.one
+print b.list
+b.list[2] = 0
+print b.list
+print a.list
 
-min = None
-
-
-
+count = 0
+while True:
+    count = count + 1
+    print count
+    if count == 10:
+        sys.exit()

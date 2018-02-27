@@ -53,16 +53,16 @@ class Board:
         self.f = self.h + self.g
 
     # Expands new possible states
-    def moveBlock(self):
+    def expand(self):
         zeroX, zeroY = self.goalCoordinates('0')
         print "zeroX:", zeroX
         print "zeroY:", zeroY
 
-        # Checks if a block can be moved left
+        # Checks if a block can be moved up
         if 0 <= zeroX + 1 <=2:
             Successor(self, "up")
 
-        '''# Checks if a block can be moved right
+        '''# Checks if a block can be moved down
         if 0 <= zeroX - 1 <=2:
             newState = self
             block = self.state[zeroX - 1][zeroY]
@@ -75,7 +75,7 @@ class Board:
                 newState.g = self.g + 1
                 self.manhattanDistance()
 
-        # Checks if a block can be moved up
+        # Checks if a block can be moved left
         if 0 <= zeroY + 1 <=2:
             newState = self
             block = self.state[zeroX][zeroY + 1]
@@ -88,7 +88,7 @@ class Board:
                 newState.g = self.g + 1
                 self.manhattanDistance()
 
-        # Checks if a block can be moved down
+        # Checks if a block can be moved right
         if 0 <= zeroY - 1 <=2:
             newState = self
             block = self.state[zeroX][zeroY - 1]
@@ -112,17 +112,22 @@ class Board:
 
     # Finds the board with the lowest f that hasn't been expanded
     def lowestF(self):
-        min = 1000000  # very high initialization value
+        min = None  # very high initialization value
         for i in range(len(boardList)):
+            if boardList[i].expanded == False and min == None:
+                min = boardList[i].f
+                minIndex = i
             if boardList[i].expanded == False and boardList[i].f < min:
                 min = boardList[i].f
                 minIndex = i
-        boardList[minIndex].moveBlock()  # selects lowest board with lowest f to expand in moveBlock
+
+        boardList[minIndex].expand()  # selects lowest board with lowest f to expand in moveBlock
 
 
 class Successor(Board):
     def __init__(self, parent, direction):
-        self.state = parent.state
+        x = parent.state
+        self.state = x
         self.f = parent.f  # function = g + h
         self.g = parent.g  # cost function
         self.h = parent.h  # hueristic = Manhattan distance
@@ -130,11 +135,14 @@ class Successor(Board):
         self.expanded = False
 
         if direction == "up":
+            print "pre parent.state", parent.state
             zeroX, zeroY = self.goalCoordinates('0')
             block = self.state[zeroX + 1][zeroY]
             self.state[zeroX + 1][zeroY] = '0'
             self.state[zeroX][zeroY] = block
+            print "post parent.state:", parent.state  # BUG! changes parent.state
             if self.uniqueState():
+                print "check 2"  # BUG! does not print
                 self.moveList.append(block, "up")
                 self.g = self.g + 1
                 self.manhattanDistance()
@@ -169,4 +177,10 @@ print
 print "boardList after:"
 for b in boardList:
     print b.state
+
+
+
+
+
+
 

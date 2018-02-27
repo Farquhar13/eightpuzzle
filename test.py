@@ -1,11 +1,24 @@
 
 list = [None]
 
-
-print list
-'''class MyClass:
+class MyClass:
     def __init__(self):
         self.one = 1
+        print "printing from class"
 
-list.append(MyClass())
-print list[0].one'''
+class LowerClass(MyClass):
+    def __init__(self, parent):
+        self.one = parent.one
+
+higher = MyClass()
+lower = LowerClass(higher)
+print "higher", higher.one
+print "lower:", lower.one
+lower.one = 2
+print "higher", higher.one
+print "lower:", lower.one
+
+min = None
+
+
+

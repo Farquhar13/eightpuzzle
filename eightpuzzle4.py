@@ -217,7 +217,6 @@ print "boardList before:"
 for b in boardList:
     print b.state
 
-
 startState.lowestF()
 
 '''print "boardList after:"

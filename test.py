@@ -1,24 +1,11 @@
 import copy
 import sys
 
-list = [None]
+class myClass:
+    def __init__(self, q = 'q'):
+        print "1"
+        self.q = q
 
-class MyClass:
-    def __init__(self):
-        self.one = 1
-        self.list = [1, 2, 3]
+a = myClass('a')
+print a.q
 
-a = MyClass()
-b = copy.deepcopy(a)
-
-print b.list
-b.list[2] = 0
-print b.list
-print a.list
-
-count = 0
-while True:
-    count = count + 1
-    print count
-    if count == 10:
-        sys.exit()

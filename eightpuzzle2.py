@@ -1,8 +1,9 @@
 import sys
+import copy
 
 boardList = []
 
-class Board:
+class Board(object):
     def __init__(self):
         self.state = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.f = -1  # function = g + h
@@ -10,6 +11,9 @@ class Board:
         self.h = -1  # hueristic = Manhattan distance
         self.moveList = []
         self.expanded = False
+
+    def successor(cls):
+        return  cls()
 
     # Initializes the board state
     def setState(self, argvStartIndex):
@@ -54,30 +58,25 @@ class Board:
 
     # Expands new possible states
     def expand(self):
-        global boardList
         zeroX, zeroY = self.goalCoordinates('0')
 
         # Checks if a block can be moved up
         if 0 <= zeroX + 1 <=2:
-            boardList.append(Board())
-            boardList[-1].state = self.state
-            boardList[-1].f = self.f  # function = g + h
-            boardList[-1].g = self.g  # cost function
-            boardList[-1].h = self.h  # hueristic = Manhattan distance
-            boardList[-1].moveList = self.moveList
-            boardList[-1].expanded = False
+            new_board = self.successor()
+            print new_board.state
 
             print "pre self.state", self.state
-            block = boardList[-1].state[zeroX + 1][zeroY]
-            boardList[-1].state[zeroX + 1][zeroY] = '0'
-            boardList[-1].state[zeroX][zeroY] = block
-            print "new board.state", boardList[-1].state
+            block = new_board.state[zeroX + 1][zeroY]
+            new_board.state[zeroX + 1][zeroY] = '0'
+            new_board.state[zeroX][zeroY] = block
+            print "new board.state", new_board.state
             print "post self.state", self.state
-            if boardList[-1].uniqueState():
+            if new_board.uniqueState():
                 print "check 2"  # BUG! does not print.  uniqueState is returning false
-                boardList[-1].moveList.append(block, "up")
-                boardList[-1].g = boardList[-1].g + 1
-                boardList[-1].manhattanDistance()
+                new_board.moveList.append(block, "up")
+                new_board.g = boardList[-1].g + 1
+                new_board.manhattanDistance()
+                boardList.append(new_board)
             '''else:
                 del boardList[-1]'''
 
@@ -131,42 +130,14 @@ class Board:
 
     # Finds the board with the lowest f that hasn't been expanded
     def lowestF(self):
-        min = None  # very high initialization value
+        min = sys.maxint  # very high initialization value
         for i in range(len(boardList)):
-            if boardList[i].expanded == False and min == None:
-                min = boardList[i].f
-                minIndex = i
             if boardList[i].expanded == False and boardList[i].f < min:
                 min = boardList[i].f
                 minIndex = i
 
         boardList[minIndex].expanded = True
         boardList[minIndex].expand()  # selects lowest board with lowest f to expand in moveBlock
-
-
-class Successor(Board):
-    def __init__(self, parent, direction):
-        self.state = parent.state
-        self.f = parent.f  # function = g + h
-        self.g = parent.g  # cost function
-        self.h = parent.h  # hueristic = Manhattan distance
-        self.moveList = parent.moveList
-        self.expanded = False
-
-        if direction == "up":
-            print "pre parent.state", parent.state
-            zeroX, zeroY = self.goalCoordinates('0')
-            block = self.state[zeroX + 1][zeroY]
-            self.state[zeroX + 1][zeroY] = '0'
-            self.state[zeroX][zeroY] = block
-            print "post parent.state:", parent.state  # BUG! changes parent.state
-            if self.uniqueState():
-                print "check 2"  # BUG! does not print
-                self.moveList.append(block, "up")
-                self.g = self.g + 1
-                self.manhattanDistance()
-                boardList.append(self)
-
 
 
 startState = Board()

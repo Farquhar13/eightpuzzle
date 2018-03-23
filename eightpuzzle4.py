@@ -37,8 +37,8 @@ class Board:
                 blockDistance = abs(i - coordinate[0]) + abs(j - coordinate[1])  # determines how far the block is from the goal state position
                 totalDistance = totalDistance + blockDistance  # sums each block's distance from goal position
         self.h = totalDistance
-        print self.h
-        print
+        #print self.h
+        #print
 
         # Win condition
         if self.h == 0:
@@ -67,54 +67,57 @@ class Board:
 
         # Checks if a block can be moved up
         if 0 <= zeroX + 1 <=2:
-            print "up"
+            #print "up"
             boardList.append(copy.deepcopy(self))
 
             block = boardList[-1].state[zeroX + 1][zeroY]
             boardList[-1].state[zeroX + 1][zeroY] = '0'
             boardList[-1].state[zeroX][zeroY] = block
-            print boardList[-1].state
+            #print boardList[-1].state
 
             if boardList[-1].uniqueState():
                 boardList[-1].moveList.append([block, "up"])
                 boardList[-1].g = boardList[-1].g + 1
                 boardList[-1].manhattanDistance()
+                boardList[-1].expanded = False
             else:
                 #print "delete 1"
                 del boardList[-1]
 
         # Checks if a block can be moved down
         if 0 <= zeroX - 1 <=2:
-            print "down"
+            #print "down"
             boardList.append(copy.deepcopy(self))
 
             block = boardList[-1].state[zeroX - 1][zeroY]
             boardList[-1].state[zeroX - 1][zeroY] = '0'
             boardList[-1].state[zeroX][zeroY] = block
-            print boardList[-1].state
+            #print boardList[-1].state
 
             if boardList[-1].uniqueState():
                 boardList[-1].moveList.append([block, "down"])
                 boardList[-1].g = boardList[-1].g + 1
                 boardList[-1].manhattanDistance()
+                boardList[-1].expanded = False
             else:
                 #print "delete 2"
                 del boardList[-1]
 
         # Checks if a block can be moved left
         if 0 <= zeroY + 1 <=2:
-            print "left"
+            #print "left"
             boardList.append(copy.deepcopy(self))
 
             block = boardList[-1].state[zeroX][zeroY + 1]
             boardList[-1].state[zeroX][zeroY + 1] = '0'
             boardList[-1].state[zeroX][zeroY] = block
-            print boardList[-1].state
+            #print boardList[-1].state
 
             if boardList[-1].uniqueState():
                 boardList[-1].moveList.append([block, "left"])
                 boardList[-1].g = boardList[-1].g + 1
                 boardList[-1].manhattanDistance()
+                boardList[-1].expanded = False
             else:
                 #print "delete 3"
                 #print boardList[-1].state
@@ -125,18 +128,19 @@ class Board:
 
         # Checks if a block can be moved right
         if 0 <= zeroY - 1 <=2:
-            print "right"
+            #print "right"
             boardList.append(copy.deepcopy(self))
 
             block = boardList[-1].state[zeroX][zeroY - 1]
             boardList[-1].state[zeroX][zeroY - 1] = '0'
             boardList[-1].state[zeroX][zeroY] = block
-            print boardList[-1].state
+            #print boardList[-1].state
 
             if boardList[-1].uniqueState():
                 boardList[-1].moveList.append([block, "right"])
                 boardList[-1].g = boardList[-1].g + 1
                 boardList[-1].manhattanDistance()
+                boardList[-1].expanded = False
             else:
                 #print "delete 4"
                 #print boardList[-1].state
@@ -150,10 +154,10 @@ class Board:
         global boardList
         for board in boardList[:-1]:
             if self.state == board.state:
-                print "False"
+                #print "False"
                 return False
             else:
-                print "True"
+                #print "True"
                 return True
 
     # Finds the board with the lowest f that hasn't been expanded
@@ -161,7 +165,7 @@ class Board:
         count = 0
         while True:
             #this section for testing purposes
-            count = count + 1
+            '''count = count + 1
             if count == 5:
                 print "5 iterations"
                 if boardList[-1].state == boardList[6].state:
@@ -169,10 +173,11 @@ class Board:
                 print "boardList after:"
                 for b in boardList:
                     print b.state
-                sys.exit()
+                sys.exit()'''
 
             min = sys.maxint
             minBoard = None
+
             '''for board in boardList:
                 if board.expanded == False and board.f < min:
                     min = board.f
@@ -185,7 +190,7 @@ class Board:
                 if boardList[i].expanded == False and boardList[i].f < min:
                     min = boardList[i].f
                     minIndex = i
-                    print "minIndex", minIndex
+                    #print "minIndex", minIndex
             #print "minIndex:", minIndex
             boardList[minIndex].expanded = True
             boardList[minIndex].expand()  # selects lowest board with lowest f to expand in moveBlock
@@ -215,6 +220,6 @@ for b in boardList:
 
 startState.lowestF()
 
-print "boardList after:"
+'''print "boardList after:"
 for b in boardList:
-    print b.state
+    print b.state'''

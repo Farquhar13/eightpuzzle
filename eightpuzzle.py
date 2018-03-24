@@ -2,7 +2,7 @@ import sys
 import copy
 
 boardList = []
-goal_state = [['0','1','2'], ['3','4','5'], ['6','7','8']]
+goal_state = [['0', '1', '2'], ['3', '4', '5'], ['6', '7', '8']]
 
 class Board:
     def __init__(self, argv_starting_index):
@@ -10,7 +10,7 @@ class Board:
         self.h = self.manhattanDistance()
         self.g = 0  # cost function
         self.f = self.update_f()
-        self.moveList = []
+        self.moveList = [["start", "start"]]
 
     # Initializes the starting board state
     def setState(self, argv_starting_index):
@@ -61,94 +61,6 @@ class Board:
                 print m
             sys.exit(0)
 
-    # Expands new possible states
-    def expand(self):
-        global boardList
-        zeroX, zeroY = self.find_coordinate('0')
-
-        # Checks if a block can be moved up
-        if 0 <= zeroX + 1 <=2:
-            #print "up"
-            boardList.append(copy.deepcopy(self))
-
-            block = boardList[-1].state[zeroX + 1][zeroY]
-            boardList[-1].state[zeroX + 1][zeroY] = '0'
-            boardList[-1].state[zeroX][zeroY] = block
-            #print boardList[-1].state
-
-            if boardList[-1].uniqueState():
-                boardList[-1].moveList.append([block, "up"])
-                boardList[-1].g = boardList[-1].g + 1
-                boardList[-1].manhattanDistance()
-                boardList[-1].expanded = False
-            else:
-                #print "delete 1"
-                del boardList[-1]
-
-        # Checks if a block can be moved down
-        if 0 <= zeroX - 1 <=2:
-            #print "down"
-            boardList.append(copy.deepcopy(self))
-
-            block = boardList[-1].state[zeroX - 1][zeroY]
-            boardList[-1].state[zeroX - 1][zeroY] = '0'
-            boardList[-1].state[zeroX][zeroY] = block
-            #print boardList[-1].state
-
-            if boardList[-1].uniqueState():
-                boardList[-1].moveList.append([block, "down"])
-                boardList[-1].g = boardList[-1].g + 1
-                boardList[-1].manhattanDistance()
-                boardList[-1].expanded = False
-            else:
-                #print "delete 2"
-                del boardList[-1]
-
-        # Checks if a block can be moved left
-        if 0 <= zeroY + 1 <=2:
-            #print "left"
-            boardList.append(copy.deepcopy(self))
-
-            block = boardList[-1].state[zeroX][zeroY + 1]
-            boardList[-1].state[zeroX][zeroY + 1] = '0'
-            boardList[-1].state[zeroX][zeroY] = block
-            #print boardList[-1].state
-
-            if boardList[-1].uniqueState():
-                boardList[-1].moveList.append([block, "left"])
-                boardList[-1].g = boardList[-1].g + 1
-                boardList[-1].manhattanDistance()
-                boardList[-1].expanded = False
-            else:
-                #print "delete 3"
-                #print boardList[-1].state
-                #print "len before", len(boardList)
-                del boardList[-1]
-                #print "len after", len(boardList)
-
-
-        # Checks if a block can be moved right
-        if 0 <= zeroY - 1 <=2:
-            #print "right"
-            boardList.append(copy.deepcopy(self))
-
-            block = boardList[-1].state[zeroX][zeroY - 1]
-            boardList[-1].state[zeroX][zeroY - 1] = '0'
-            boardList[-1].state[zeroX][zeroY] = block
-            #print boardList[-1].state
-
-            if boardList[-1].uniqueState():
-                boardList[-1].moveList.append([block, "right"])
-                boardList[-1].g = boardList[-1].g + 1
-                boardList[-1].manhattanDistance()
-                boardList[-1].expanded = False
-            else:
-                #print "delete 4"
-                #print boardList[-1].state
-                #print "len before", len(boardList)
-                del boardList[-1]
-                #print "len after", len(boardList)
-
     # Returns the board with the lowest f and removes it from boardList
     def get_lowest_f(self):
             minimum = sys.maxint
@@ -158,6 +70,45 @@ class Board:
                     minimum = boardList[i].f
                     min_index = i
             return boardList.pop(min_index)
+
+    def find_moves(self):
+        zeroX, zeroY = self.find_coordinate('0')
+        last_move = self.moveList[-1][1]
+
+        if 0 <= zeroX + 1 <= 2 and last_move != 'up':
+            nb = copy.deepcopy(self)
+            block = nb.state[zeroX + 1][zeroY]
+            nb.state[zeroX + 1][zeroY] = '0'
+            nb.state[zeroX][zeroY] = block
+            nb.update_and_append(block, "up")
+
+        if 0 <= zeroX - 1 <= 2 and last_move != 'down':
+            nb = copy.deepcopy(self)
+            block = nb.state[zeroX - 1][zeroY]
+            nb.state[zeroX - 1][zeroY] = '0'
+            nb.state[zeroX][zeroY] = block
+            nb.update_and_append(block, "down")
+
+        if 0 <= zeroY + 1 <=2 and last_move != 'left':
+            nb = copy.deepcopy(self)
+            block = nb.state[zeroX][zeroY + 1]
+            nb.state[zeroX][zeroY + 1] = '0'
+            nb.state[zeroX][zeroY] = block
+            nb.update_and_append(block, "left")
+
+        if 0 <= zeroY - 1 <= 2 and last_move != 'right':
+            nb = copy.deepcopy(self)
+            block = nb.state[zeroX][zeroY - 1]
+            nb.state[zeroX][zeroY - 1] = '0'
+            nb.state[zeroX][zeroY] = block
+            nb.update_and_append(block, "right")
+
+    def update_and_append(self, block, direction):
+        self.g = self.g + 1
+        self.h = self.manhattanDistance()
+        self.f = self.update_f()
+        self.moveList.append([block, direction])
+        boardList.append(self)
 
     # Prints the state of a puzzle
     def printPuzzle(self):
@@ -180,13 +131,14 @@ boardList.append(start_state)
 print "Start State:"
 start_state.printPuzzle()
 
+start_state.find_moves()
+for b in boardList:
+    print b.state
+print boardList[-1].g
+print boardList[-1].h
+print boardList[-1].f
+print boardList[-1].moveList
+
 '''print "boardList after:"
 for b in boardList:
     print b.state'''
-
-
-
-
-
-
-

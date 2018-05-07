@@ -3,6 +3,7 @@ import copy
 
 boardList = []
 goal_state = [['0', '1', '2'], ['3', '4', '5'], ['6', '7', '8']]
+duds = []
 
 class Board:
     def __init__(self, argv_starting_index):
@@ -69,7 +70,9 @@ class Board:
                 if boardList[i].f < minimum:
                     minimum = boardList[i].f
                     min_index = i
-            return boardList.pop(min_index)
+            the_chosen_one = boardList.pop(min_index)
+            duds.append(the_chosen_one.state)
+            return the_chosen_one
 
     def find_moves(self):
         zeroX, zeroY = self.find_coordinate('0')
@@ -104,11 +107,13 @@ class Board:
             nb.update_and_append(block, "right")
 
     def update_and_append(self, block, direction):
-        self.g = self.g + 1
-        self.h = self.manhattanDistance()
-        self.f = self.update_f()
-        self.moveList.append([block, direction])
-        boardList.append(self)
+        repeat = self.no_loops()
+        if repeat == True:
+            self.g = self.g + 1
+            self.h = self.manhattanDistance()
+            self.f = self.update_f()
+            self.moveList.append([block, direction])
+            boardList.append(self)
 
     # Prints the state of a puzzle
     def printPuzzle(self):
@@ -116,6 +121,15 @@ class Board:
             for block in row:
                 print block,
             print "\n"
+
+    def no_loops(self):
+        for past_state in duds:
+            if self.state == past_state:
+                return False
+            else:
+                return True
+
+
 
 
 def init_goal_state(argv_index):
@@ -131,14 +145,32 @@ boardList.append(start_state)
 print "Start State:"
 start_state.printPuzzle()
 
-start_state.find_moves()
+
+'''start_state.find_moves()
 for b in boardList:
     print b.state
 print boardList[-1].g
 print boardList[-1].h
 print boardList[-1].f
-print boardList[-1].moveList
+print boardList[-1].moveList'''
 
 '''print "boardList after:"
 for b in boardList:
     print b.state'''
+
+c = 0
+while True:
+    for b in boardList:
+        c += 1
+        if c == 20:
+            print "duds"
+            for d in duds:
+                print d
+            sys.exit(0)
+        if b != None:
+            board = b.get_lowest_f()
+            print board.h
+            board.find_moves()
+            break
+
+

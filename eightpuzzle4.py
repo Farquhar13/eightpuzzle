@@ -48,7 +48,6 @@ class Board:
                     coordinate = i, j
                     return coordinate
 
-
     # Updates our function f
     def updateF(self):
         return self.h + self.g
@@ -59,8 +58,7 @@ class Board:
             print
             "Manhattan distance = 0!"
             for m in self.moveList:
-                print
-                m
+                print m
                 sys.exit()
 
     # Expands new possible states

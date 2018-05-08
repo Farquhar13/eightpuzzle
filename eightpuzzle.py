@@ -5,7 +5,7 @@ boardList = []
 goal_state = [['0', '1', '2'], ['3', '4', '5'], ['6', '7', '8']]
 duds = []
 
-class Board:
+class Board():
     def __init__(self, argv_starting_index):
         self.state = self.setState(argv_starting_index)
         self.h = self.manhattanDistance()
@@ -78,33 +78,35 @@ class Board:
         zeroX, zeroY = self.find_coordinate('0')
         last_move = self.moveList[-1][1]
 
-        if 0 <= zeroX + 1 <= 2 and last_move != 'up':
-            nb = copy.deepcopy(self)
+        if 0 <= (zeroX + 1) and (zeroX + 1) <= 2:
+            nb = Child(self)
             block = nb.state[zeroX + 1][zeroY]
             nb.state[zeroX + 1][zeroY] = '0'
             nb.state[zeroX][zeroY] = block
             nb.update_and_append(block, "up")
 
-        if 0 <= zeroX - 1 <= 2 and last_move != 'down':
-            nb = copy.deepcopy(self)
+        if 0 <= (zeroX - 1) and (zeroX - 1) <= 2:
+            nb = Child(self)
             block = nb.state[zeroX - 1][zeroY]
             nb.state[zeroX - 1][zeroY] = '0'
             nb.state[zeroX][zeroY] = block
             nb.update_and_append(block, "down")
 
-        if 0 <= zeroY + 1 <=2 and last_move != 'left':
-            nb = copy.deepcopy(self)
+        if 0 <= (zeroY + 1) and (zeroY + 1) <=2:
+            nb = Child(self)
             block = nb.state[zeroX][zeroY + 1]
             nb.state[zeroX][zeroY + 1] = '0'
             nb.state[zeroX][zeroY] = block
             nb.update_and_append(block, "left")
 
-        if 0 <= zeroY - 1 <= 2 and last_move != 'right':
-            nb = copy.deepcopy(self)
+        if 0 <= (zeroY - 1) and (zeroY - 1) <= 2:
+            nb = Child(self)
             block = nb.state[zeroX][zeroY - 1]
             nb.state[zeroX][zeroY - 1] = '0'
             nb.state[zeroX][zeroY] = block
             nb.update_and_append(block, "right")
+
+        #print "self.state", self.state
 
     def update_and_append(self, block, direction):
         repeat = self.no_loops()
@@ -129,6 +131,34 @@ class Board:
             else:
                 return True
 
+    def copy_mutable_state(self):
+        new_state = [['0', '0', '0'], ['0', '0', '0'], ['0' , '0', '0']]
+        for i in range(3):
+            for j in range(3):
+                new_state[i][j] = self.state[i][j]
+        return new_state
+
+    def loop(self):
+        c = 0
+        while True:
+            board = self.get_lowest_f()
+            board.find_moves()
+
+            c += 1
+            if c == 20000:
+                board = self.get_lowest_f()
+                print board.h
+                sys.exit(0)
+
+
+
+class Child(Board):
+    def __init__(self, parent):
+        self.state = parent.copy_mutable_state()
+        self.h = parent.h
+        self.g = parent.g
+        self.f = parent.f
+        self.moveList = parent.moveList
 
 
 
@@ -145,32 +175,19 @@ boardList.append(start_state)
 print "Start State:"
 start_state.printPuzzle()
 
-
-'''start_state.find_moves()
-for b in boardList:
-    print b.state
-print boardList[-1].g
-print boardList[-1].h
-print boardList[-1].f
-print boardList[-1].moveList'''
+start_state.loop()
 
 '''print "boardList after:"
 for b in boardList:
     print b.state'''
 
-c = 0
+'''c = 0
 while True:
-    for b in boardList:
-        c += 1
-        if c == 20:
-            print "duds"
-            for d in duds:
-                print d
-            sys.exit(0)
-        if b != None:
-            board = b.get_lowest_f()
-            print board.h
-            board.find_moves()
-            break
+    board = boardList[-1].get_lowest_f()
+    board.find_moves()
 
-
+    c += 1
+    if c == 30000:
+        board = boardList[-1].get_lowest_f()
+        print board.h
+        sys.exit(0)'''

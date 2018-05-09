@@ -3,7 +3,7 @@ import copy
 
 boardList = []
 goal_state = [['0', '1', '2'], ['3', '4', '5'], ['6', '7', '8']]
-duds = []
+duds = [] # list for past board states
 
 class Board():
     def __init__(self, argv_starting_index):
@@ -34,7 +34,7 @@ class Board():
                 totalDistance += blockDistance  # sums each block's distance from goal position
         return totalDistance
 
-    # Finds the coordinate of a block, given as an argument
+    # Finds the coordinate of a block in the goal state
     def goalCoordinates(self, block):
         for i in range(0,3):
             for j in range(0,3):
@@ -42,6 +42,7 @@ class Board():
                     coordinate = i, j
                     return coordinate
 
+    # Finds the coordinate of a block, given as an argument
     def find_coordinate(self, block):
         for i in range(0,3):
             for j in range(0,3):
@@ -55,11 +56,14 @@ class Board():
         self.win_condition()
         return self.h + self.g
 
+    # checks for goal state
     def win_condition(self):
         if self.h == 0:
             print "Manhattan distance = 0!"
             for m in self.moveList:
                 print m
+            print "\nFinal State:"
+            self.printPuzzle()
             sys.exit(0)
 
     # Returns the board with the lowest f and removes it from boardList
@@ -74,6 +78,7 @@ class Board():
             duds.append(the_chosen_one.state)
             return the_chosen_one
 
+    # makes valid moves
     def find_moves(self):
         zeroX, zeroY = self.find_coordinate('0')
         last_move = self.moveList[-1][1]
@@ -106,8 +111,8 @@ class Board():
             nb.state[zeroX][zeroY] = block
             nb.update_and_append(block, "right")
 
-        #print "self.state", self.state
 
+    # checks state is unique, updates function variables, and adds to boardList
     def update_and_append(self, block, direction):
         repeat = self.no_loops()
         if repeat == True:
@@ -117,20 +122,21 @@ class Board():
             self.moveList.append([block, direction])
             boardList.append(self)
 
-    # Prints the state of a puzzle
+    # Prints the board state of a puzzle
     def printPuzzle(self):
         for row in self.state:
             for block in row:
                 print block,
             print "\n"
 
+    # makes sure the new state has not already been expanded
     def no_loops(self):
         for past_state in duds:
             if self.state == past_state:
                 return False
-            else:
-                return True
+        return True
 
+    # this is needed so that changes to new states don't also change parent state ei. new.state = parent.state
     def copy_mutable_state(self):
         new_state = [['0', '0', '0'], ['0', '0', '0'], ['0' , '0', '0']]
         for i in range(3):
@@ -139,19 +145,11 @@ class Board():
         return new_state
 
     def loop(self):
-        c = 0
         while True:
             board = self.get_lowest_f()
             board.find_moves()
 
-            c += 1
-            if c == 20000:
-                board = self.get_lowest_f()
-                print board.h
-                sys.exit(0)
-
-
-
+# inherits from board - creates objects for new states
 class Child(Board):
     def __init__(self, parent):
         self.state = parent.copy_mutable_state()
@@ -161,7 +159,7 @@ class Child(Board):
         self.moveList = parent.moveList
 
 
-
+# initialize goal state
 def init_goal_state(argv_index):
     for row in range(3):
         for column in range(3):
@@ -176,18 +174,3 @@ print "Start State:"
 start_state.printPuzzle()
 
 start_state.loop()
-
-'''print "boardList after:"
-for b in boardList:
-    print b.state'''
-
-'''c = 0
-while True:
-    board = boardList[-1].get_lowest_f()
-    board.find_moves()
-
-    c += 1
-    if c == 30000:
-        board = boardList[-1].get_lowest_f()
-        print board.h
-        sys.exit(0)'''
